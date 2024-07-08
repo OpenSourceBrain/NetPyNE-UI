@@ -160,7 +160,6 @@ class NetPyNEPopulation extends React.Component {
           newValue,
           (response, newValue) => {
             this.renaming = false;
-            // this.props.updateCards();
           },
         );
         this.renaming = true;
