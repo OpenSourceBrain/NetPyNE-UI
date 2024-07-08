@@ -10,15 +10,25 @@ import {
   newWidget,
   maximiseWidget,
 } from '@metacell/geppetto-meta-client/common/actions';
+import { WidgetStatus } from '@metacell/geppetto-meta-client/common/layout/model';
 import { TOPBAR_CONSTANTS } from '../constants';
 import PythonControlledCapability from './general/PythonControlledCapability';
 import { openBackendErrorDialog, closeBackendErrorDialog } from '../redux/actions/errors';
 import {
   updateCards, editModel, simulateNetwork, createNetwork, closeDialog,
   createAndSimulateNetwork, showNetwork, pythonCall, deleteNetParamsObj, resetModel,
-  setDefaultWidgets, changeInstanceColor, openConfirmationDialog, closeConfirmationDialog, selectInstances,
+  setDefaultWidgets, openConfirmationDialog, closeConfirmationDialog, selectInstances,
 } from '../redux/actions/general';
-import { runControlledStep, startTutorial, stopTutorial, addDiscoveredStep, runControlledStepByElementId, incrementTutorialStep, validateTutorialStep, checkBubbleRender } from '../redux/actions/tutorials';
+import {
+  runControlledStep,
+  startTutorial,
+  stopTutorial,
+  addDiscoveredStep,
+  runControlledStepByElementId,
+  incrementTutorialStep,
+  validateTutorialStep,
+  checkBubbleRender,
+} from '../redux/actions/tutorials';
 import { updateConsole } from '../redux/actions/console';
 import {
   cloneExperiment,
@@ -26,7 +36,7 @@ import {
   openLaunchDialog,
   removeExperiment,
   addExperiment,
-  editExperiment
+  editExperiment,
 } from '../redux/actions/experiments';
 
 import {
@@ -72,12 +82,9 @@ import _ExperimentEdit from './experiments/ExperimentEdit';
 import _ExperimentManager from './experiments/ExperimentManager';
 import _LaunchDialog from './topbar/dialogs/LaunchDialog';
 import _NetPyNEPythonConsole from './general/NetPyNEPythonConsole';
-import _PlotViewer from './general/PlotViewer';
 import _TutorialObserver from './general/TutorialObserver';
 import _ExperimentControlPanel from './general/ExperimentControlPanel';
 import _Rxd from './rxd/Wrapper';
-import { WidgetStatus } from '@metacell/geppetto-meta-client/common/layout/model';
-import Textbox from './general/Textbox';
 
 const updateCardsDispatch = (dispatch) => ({ updateCards: () => dispatch(updateCards) });
 
@@ -124,7 +131,7 @@ export const NetPyNEConnectivityRules = connect(
 );
 
 export const NetPyNESubcellsConnectivityRules = PythonControlledCapability.createPythonControlledComponent(
-  _NetPyNESubcellsConnectivityRules
+  _NetPyNESubcellsConnectivityRules,
 );
 
 export const NetPyNEPlots = PythonControlledCapability.createPythonControlledComponent(
@@ -222,7 +229,7 @@ export const ExperimentEdit = connect(
     ...ownProps,
     updates: state.general.updates,
     widgets: state.widgets,
-    visible: state.widgets?.experimentManager?.status != WidgetStatus.HIDDEN
+    visible: state.widgets?.experimentManager?.status != WidgetStatus.HIDDEN,
   }),
   (dispatch) => ({
     editExperiment: (name, details) => dispatch(editExperiment(name, details)),
@@ -387,10 +394,10 @@ export const ErrorDialog = connect(
 export const NetPyNEPythonConsole = connect(
   (state) => ({
     extensionLoaded: state.client.jupyter_geppetto_extension.loaded,
-    notebookVisible: state.widgets?.python?.status != WidgetStatus.MINIMIZED
+    notebookVisible: state.widgets?.python?.status != WidgetStatus.MINIMIZED,
   }),
   (dispatch) => ({
-    updateConsole: (commands) => dispatch(updateConsole(commands))
+    updateConsole: (commands) => dispatch(updateConsole(commands)),
   }),
 )(_NetPyNEPythonConsole);
 
@@ -503,17 +510,16 @@ export const TutorialObserver = connect(
     lastCheckRender: state.tutorial.lastCheckRender,
   }),
   (dispatch) => ({
-    startTutorialStep: () => { dispatch(startTutorial()) },
-    runControlledStep: () => { dispatch(runControlledStep()) },
-    stopTutorialStep: () => { dispatch(stopTutorial()) },
-    validateTutorialStep: (e) => { dispatch(validateTutorialStep(e)) },
-    addDiscoveredStep: (nodeIdList) => { dispatch(addDiscoveredStep(nodeIdList)) },
-    runControlledStepByElementId: (e) => { dispatch(runControlledStepByElementId(e))},
+    startTutorialStep: () => { dispatch(startTutorial()); },
+    runControlledStep: () => { dispatch(runControlledStep()); },
+    stopTutorialStep: () => { dispatch(stopTutorial()); },
+    validateTutorialStep: (e) => { dispatch(validateTutorialStep(e)); },
+    addDiscoveredStep: (nodeIdList) => { dispatch(addDiscoveredStep(nodeIdList)); },
+    runControlledStepByElementId: (e) => { dispatch(runControlledStepByElementId(e)); },
     incrementTutorialStep: (e) => { dispatch(incrementTutorialStep()); },
-    checkBubbleRender: (e) => { dispatch(checkBubbleRender(e))}
+    checkBubbleRender: (e) => { dispatch(checkBubbleRender(e)); },
   }),
 )(_TutorialObserver);
-
 
 // ---------------------------------------------------------------------------------------- //
 
