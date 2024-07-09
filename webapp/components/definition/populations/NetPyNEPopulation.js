@@ -59,6 +59,7 @@ class NetPyNEPopulation extends React.Component {
       model: undefined,
     };
 
+    this.resetError = this.resetError.bind(this);
     this.updateModel();
   }
 
@@ -558,6 +559,15 @@ netpyne_geppetto.netParams.popParams['${this.props.name}']['pulses'].pop(${index
     );
   }
 
+  resetError () {
+    this.setState({
+      errorMessage: undefined,
+      errorDetails: undefined,
+    }, () => {
+      this.props.updateCards();
+    });
+  }
+
   render () {
     const { classes } = this.props;
 
@@ -575,10 +585,7 @@ netpyne_geppetto.netParams.popParams['${this.props.name}']['pulses'].pop(${index
           <Button
             variant="contained"
             color="primary"
-            onClick={() => this.setState({
-              errorMessage: undefined,
-              errorDetails: undefined,
-            })}
+            onClick={this.resetError}
           >
             BACK
           </Button>
