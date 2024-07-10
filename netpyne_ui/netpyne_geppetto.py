@@ -330,6 +330,8 @@ class NetPyNEGeppetto:
         use_prev_inst = args.get('usePrevInst', False)
         sim_id = args.get('simId', 0)
         try:
+            # Note this has been commented for CNS 24 since some models were failing
+            # there is a discussion about making this non blocker, to follow up with Salva and Padraig
             # self.validate_netParams()
 
             experiment = experiments.get_current()
@@ -805,6 +807,8 @@ class NetPyNEGeppetto:
         return utils.getJSONReply()
 
     def instantiateNetPyNEModel(self):
+        # Note this has been commented for CNS 24 since some models were failing
+        # there is a discussion about making this non blocker, to follow up with Salva and Padraig
         # self.validate_netParams()
         with redirect_stdout(sys.__stdout__):
             saveData = sim.allSimData if hasattr(sim, 'allSimData') and 'spkt' in sim.allSimData.keys() and len(
