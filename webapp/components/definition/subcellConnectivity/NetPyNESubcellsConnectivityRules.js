@@ -8,7 +8,7 @@ import Utils from '../../../Utils';
 import NetPyNEHome from '../../general/NetPyNEHome';
 import NetPyNEAddNew from '../../general/NetPyNEAddNew';
 
-import NetPyNEConnectivityRule from './NetPyNESubcellsConnectivityRule';
+import NetPyNESubcellsConnectivityRule from './NetPyNESubcellsConnectivityRule';
 
 import RulePath from '../../general/RulePath';
 import Accordion from '../../general/ExpansionPanel';
@@ -254,11 +254,12 @@ export default class NetPyNESubCellsConnectivityRules extends Component {
           .indexOf(this.state.selectedConnectivityRule) > -1
       ) {
         selectedConnectivityRule = (
-          <NetPyNEConnectivityRule
+          <NetPyNESubcellsConnectivityRule
             name={this.state.selectedConnectivityRule}
             model={this.state.value[this.state.selectedConnectivityRule]}
             selectPage={this.selectPage}
             renameHandler={this.handleRenameChildren}
+            updateCards={this.props.updateCards}
           />
         );
       }

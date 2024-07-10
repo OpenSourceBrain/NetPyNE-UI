@@ -130,8 +130,16 @@ export const NetPyNEConnectivityRules = connect(
   ),
 );
 
-export const NetPyNESubcellsConnectivityRules = PythonControlledCapability.createPythonControlledComponent(
-  _NetPyNESubcellsConnectivityRules,
+export const NetPyNESubcellsConnectivityRules = connect(
+  (state, ownProps) => ({
+    ...ownProps,
+    commands: state.console.commands,
+  }),
+  updateCardsDispatch,
+)(
+  PythonControlledCapability.createPythonControlledComponent(
+    _NetPyNESubcellsConnectivityRules,
+  ),
 );
 
 export const NetPyNEPlots = PythonControlledCapability.createPythonControlledComponent(

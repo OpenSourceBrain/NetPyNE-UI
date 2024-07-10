@@ -32,6 +32,10 @@ export default class NetPyNEConnectivityRule extends React.Component {
     };
   }
 
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    this.setState({ currentName: nextProps.name });
+  }
+
   handleRenameChange = (event) => {
     const storedValue = this.props.name;
     const newValue = Utils.nameValidation(event.target.value);
@@ -60,19 +64,7 @@ export default class NetPyNEConnectivityRule extends React.Component {
     }
   };
 
-  triggerUpdate (updateMethod) {
-    // common strategy when triggering processing of a value change, delay it, every time there is a change we reset
-    // eslint-disable-next-line eqeqeq
-    if (this.updateTimer !== undefined) {
-      clearTimeout(this.updateTimer);
-    }
-    this.updateTimer = setTimeout(updateMethod, 1000);
-  }
-
-  select = (index, sectionId) => this.setState({
-    selectedIndex: index,
-    sectionId,
-  });
+  handleChange = (event, index, values) => this.setState({ values });
 
   getBottomNavigationAction (index, sectionId, label, icon, id) {
     return (
@@ -86,6 +78,20 @@ export default class NetPyNEConnectivityRule extends React.Component {
     );
   }
 
+  select = (index, sectionId) => this.setState({
+    selectedIndex: index,
+    sectionId,
+  });
+
+  triggerUpdate (updateMethod) {
+    // common strategy when triggering processing of a value change, delay it, every time there is a change we reset
+    // eslint-disable-next-line eqeqeq
+    if (this.updateTimer !== undefined) {
+      clearTimeout(this.updateTimer);
+    }
+    this.updateTimer = setTimeout(updateMethod, 1000);
+  }
+
   postProcessMenuItems (pythonData, selected) {
     return pythonData.map((name) => (
       <MenuItem
@@ -97,10 +103,6 @@ export default class NetPyNEConnectivityRule extends React.Component {
         {name}
       </MenuItem>
     ));
-  }
-
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    this.setState({ currentName: nextProps.name });
   }
 
   render () {
@@ -445,6 +447,4 @@ export default class NetPyNEConnectivityRule extends React.Component {
       </div>
     );
   }
-
-  handleChange = (event, index, values) => this.setState({ values });
 }

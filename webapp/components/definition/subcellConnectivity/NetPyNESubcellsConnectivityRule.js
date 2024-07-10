@@ -35,27 +35,56 @@ export default class NetPyNESubCellsConnectivityRule extends React.Component {
       coord: undefined,
     };
 
+    this.select = this.select.bind(this);
     this.postProcessDensity = this.postProcessDensity.bind(this);
+    this.getGeneralTab = this.getGeneralTab.bind(this);
+    this.getPreConditionsTab = this.getPreConditionsTab.bind(this);
+    this.getPostConditionsTab = this.getPostConditionsTab.bind(this);
+    this.getDialogPop = this.getDialogPop.bind(this);
+
+    this.content = this.getGeneralTab();
+
+    this.densityExtras = this.densityExtraFun();
+    this.dialogPop = this.getDialogPop();
   }
 
-  refreshComponent () {
-    // get initial values
-    Utils.evalPythonMessage(`netpyne_geppetto.netParams.subConnParams["${
-      this.props.name
-    }"]`)
-      .then((response) => {
-        if ((typeof response === 'object') && (response.density)) {
-          this.setState({ type: response.density.type, density: response.density }); // splitting so it fires update
-        }
-      });
+  componentDidMount () {
+    this.refreshComponent();
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    this.setState({ currentName: nextProps.name, type: nextProps.model.density });
   }
 
   componentDidUpdate (prevProps, prevState) {
     if (JSON.stringify(prevProps.model) != JSON.stringify(this.props.model)) this.refreshComponent();
   }
 
-  componentDidMount () {
-    this.refreshComponent();
+  getDialogPop () {
+    return this.state.errorMessage !== undefined ? (
+      <Dialog open style={{ whiteSpace: 'pre-wrap' }}>
+        <DialogTitle id="alert-dialog-title">
+          {this.state.errorMessage}
+        </DialogTitle>
+        <DialogContent style={{ overflow: 'auto' }}>
+          <DialogContentText id="alert-dialog-description">
+            {this.state.errorDetails}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => this.setState({
+              errorMessage: undefined,
+              errorDetails: undefined,
+            })}
+          >
+            BACK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    ) : undefined;
   }
 
   handleRenameChange = (event) => {
@@ -67,7 +96,7 @@ export default class NetPyNESubCellsConnectivityRule extends React.Component {
       newValue,
       event.target.value,
       this,
-      'ConnectionRule',
+      'SubConnectionRule',
     );
 
     if (triggerCondition) {
@@ -86,19 +115,14 @@ export default class NetPyNESubCellsConnectivityRule extends React.Component {
     }
   };
 
-  triggerUpdate (updateMethod) {
-    // common strategy when triggering processing of a value change, delay it, every time there is a change we reset
-    // eslint-disable-next-line eqeqeq
-    if (this.updateTimer !== undefined) {
-      clearTimeout(this.updateTimer);
-    }
-    this.updateTimer = setTimeout(updateMethod, 1000);
-  }
+  handleChange = (event, index, values) => this.setState({ values });
 
-  select = (index, sectionId) => this.setState({
-    selectedIndex: index,
-    sectionId,
-  });
+  handleDensity (value) {
+    this.setState({ type: value });
+    Utils.execPythonMessage(
+      `netpyne_geppetto.netParams.subConnParams['${this.props.name}']['density'] = { 'type': '${value}' }`,
+    );
+  }
 
   getBottomNavigationAction (index, sectionId, label, icon, id) {
     return (
@@ -110,6 +134,15 @@ export default class NetPyNESubCellsConnectivityRule extends React.Component {
         onClick={() => this.select(index, sectionId)}
       />
     );
+  }
+
+  triggerUpdate (updateMethod) {
+    // common strategy when triggering processing of a value change, delay it, every time there is a change we reset
+    // eslint-disable-next-line eqeqeq
+    if (this.updateTimer !== undefined) {
+      clearTimeout(this.updateTimer);
+    }
+    this.updateTimer = setTimeout(updateMethod, 1000);
   }
 
   postProcessMenuItems (pythonData, selected) {
@@ -142,17 +175,6 @@ export default class NetPyNESubCellsConnectivityRule extends React.Component {
         {name}
       </MenuItem>
     ));
-  }
-
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    this.setState({ currentName: nextProps.name, type: nextProps.model.density });
-  }
-
-  handleDensity (value) {
-    this.setState({ type: value });
-    Utils.execPythonMessage(
-      `netpyne_geppetto.netParams.subConnParams['${this.props.name}']['density'] = { 'type': '${value}' }`,
-    );
   }
 
   handleCoord (value) {
@@ -248,255 +270,261 @@ export default class NetPyNESubCellsConnectivityRule extends React.Component {
     }
   }
 
-  render () {
-    const densityExtras = this.densityExtraFun();
-    const dialogPop = this.state.errorMessage !== undefined ? (
-      <Dialog open style={{ whiteSpace: 'pre-wrap' }}>
-        <DialogTitle id="alert-dialog-title">
-          {this.state.errorMessage}
-        </DialogTitle>
-        <DialogContent style={{ overflow: 'auto' }}>
-          <DialogContentText id="alert-dialog-description">
-            {this.state.errorDetails}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => this.setState({
-              errorMessage: undefined,
-              errorDetails: undefined,
-            })}
-          >
-            BACK
-          </Button>
-        </DialogActions>
-      </Dialog>
-    ) : undefined;
-
-    if (this.state.sectionId === 'General') {
-      var content = (
-        <Box className="scrollbar scrollchild" mt={1}>
-          <Box mb={1}>
-            <TextField
-              fullWidth
-              variant="filled"
-              id="ConnectivityName"
-              onChange={this.handleRenameChange}
-              value={this.state.currentName}
-              disabled={this.renaming}
-              label="The name of the connectivity rule"
-            />
-          </Box>
-
-          <NetPyNEField id="netParams.subConnParams.groupSynMechs">
-            <NetPyNESelectField
-              multiple={1}
-              model={
-                `netParams.subConnParams['${this.props.name}']['groupSynMechs']`
-              }
-              fullWidth
-              method="netpyne_geppetto.getAvailableSynMech"
-              postProcessItems={(pythonData, selected) => pythonData.map((name) => (
-                <MenuItem id={`${name}MenuItem`} key={name} value={name}>
-                  {name}
-                </MenuItem>
-              ))}
-            />
-          </NetPyNEField>
-
-          <NetPyNEField id="netParams.subConnParams.sec" className="listStyle">
-            <ListComponent
-              model={`netParams.subConnParams['${this.props.name}']['sec']`}
-            />
-          </NetPyNEField>
-
-          <NetPyNEField id="netParams.subConnParams.density.type">
-            <NetPyNESelectField
-              multiple={1}
-              fullWidth
-              method="netpyne_geppetto.getAvailableDensityTypes"
-              model={
-                `netParams.subConnParams['${this.props.name}']['density']['type']`
-              }
-              postProcessItems={this.postProcessDensity}
-            />
-          </NetPyNEField>
-
-          {densityExtras}
-
-          {dialogPop}
-        </Box>
-      );
-    } else if (this.state.sectionId === 'Pre Conditions') {
-      var content = (
-        <Box className="scrollbar scrollchild" mt={1}>
-          <NetPyNEField id="netParams.subConnParams.preConds.pop">
-            <NetPyNESelectField
-              model={
-                `netParams.subConnParams['${
-                  this.props.name
-                }']['preConds']['pop']`
-              }
-              method="netpyne_geppetto.getAvailablePops"
-              postProcessItems={this.postProcessMenuItems}
-              multiple
-            />
-          </NetPyNEField>
-
-          <NetPyNEField id="netParams.subConnParams.preConds.cellType">
-            <NetPyNESelectField
-              fullWidth
-              model={
-                `netParams.subConnParams['${
-                  this.props.name
-                }']['preConds']['cellType']`
-              }
-              method="netpyne_geppetto.getAvailableCellTypes"
-              postProcessItems={this.postProcessMenuItems}
-              multiple
-            />
-          </NetPyNEField>
-
-          <NetPyNECoordsRange
-            id="xRangePreConn"
-            name={this.props.name}
-            model="netParams.subConnParams"
-            conds="preConds"
-            items={[
-              {
-                value: 'x',
-                label: 'Absolute',
-              },
-              {
-                value: 'xnorm',
-                label: 'Normalized',
-              },
-            ]}
-          />
-
-          <NetPyNECoordsRange
-            id="yRangePreConn"
-            name={this.props.name}
-            model="netParams.subConnParams"
-            conds="preConds"
-            items={[
-              {
-                value: 'y',
-                label: 'Absolute',
-              },
-              {
-                value: 'ynorm',
-                label: 'Normalized',
-              },
-            ]}
-          />
-
-          <NetPyNECoordsRange
-            id="zRangePreConn"
-            name={this.props.name}
-            model="netParams.subConnParams"
-            conds="preConds"
-            items={[
-              {
-                value: 'z',
-                label: 'Absolute',
-              },
-              {
-                value: 'znorm',
-                label: 'Normalized',
-              },
-            ]}
+  getGeneralTab () {
+    return (
+      <Box className="scrollbar scrollchild" mt={1}>
+        <Box mb={1}>
+          <TextField
+            fullWidth
+            variant="filled"
+            id="ConnectivityName"
+            onChange={this.handleRenameChange}
+            value={this.state.currentName}
+            disabled={this.renaming}
+            label="The name of the connectivity rule"
           />
         </Box>
-      );
-    } else if (this.state.sectionId === 'Post Conditions') {
-      var content = (
-        <Box className="scrollbar scrollchild" mt={1}>
-          <NetPyNEField id="netParams.subConnParams.postConds.pop">
-            <NetPyNESelectField
-              model={
-                `netParams.subConnParams['${
-                  this.props.name
-                }']['postConds']['pop']`
-              }
-              fullWidth
-              method="netpyne_geppetto.getAvailablePops"
-              postProcessItems={this.postProcessMenuItems}
-              multiple
-            />
-          </NetPyNEField>
 
-          <NetPyNEField id="netParams.subConnParams.postConds.cellType">
-            <NetPyNESelectField
-              model={
-                `netParams.subConnParams['${
-                  this.props.name
-                }']['postConds']['cellType']`
-              }
-              method="netpyne_geppetto.getAvailableCellTypes"
-              postProcessItems={this.postProcessMenuItems}
-              multiple
-              fullWidth
-            />
-          </NetPyNEField>
-
-          <NetPyNECoordsRange
-            id="xRangePostConn"
-            name={this.props.name}
-            model="netParams.subConnParams"
-            conds="postConds"
-            items={[
-              {
-                value: 'x',
-                label: 'Absolute',
-              },
-              {
-                value: 'xnorm',
-                label: 'Normalized',
-              },
-            ]}
+        <NetPyNEField id="netParams.subConnParams.groupSynMechs">
+          <NetPyNESelectField
+            multiple={1}
+            model={
+              `netParams.subConnParams['${this.props.name}']['groupSynMechs']`
+            }
+            fullWidth
+            method="netpyne_geppetto.getAvailableSynMech"
+            postProcessItems={(pythonData, selected) => pythonData.map((name) => (
+              <MenuItem id={`${name}MenuItem`} key={name} value={name}>
+                {name}
+              </MenuItem>
+            ))}
           />
+        </NetPyNEField>
 
-          <NetPyNECoordsRange
-            id="yRangePostConn"
-            name={this.props.name}
-            model="netParams.subConnParams"
-            conds="postConds"
-            items={[
-              {
-                value: 'y',
-                label: 'Absolute',
-              },
-              {
-                value: 'ynorm',
-                label: 'Normalized',
-              },
-            ]}
+        <NetPyNEField id="netParams.subConnParams.sec" className="listStyle">
+          <ListComponent
+            model={`netParams.subConnParams['${this.props.name}']['sec']`}
           />
+        </NetPyNEField>
 
-          <NetPyNECoordsRange
-            id="zRangePostConn"
-            name={this.props.name}
-            model="netParams.subConnParams"
-            conds="postConds"
-            items={[
-              {
-                value: 'z',
-                label: 'Absolute',
-              },
-              {
-                value: 'znorm',
-                label: 'Normalized',
-              },
-            ]}
+        <NetPyNEField id="netParams.subConnParams.density.type">
+          <NetPyNESelectField
+            multiple={1}
+            fullWidth
+            method="netpyne_geppetto.getAvailableDensityTypes"
+            model={
+              `netParams.subConnParams['${this.props.name}']['density']['type']`
+            }
+            postProcessItems={this.postProcessDensity}
           />
-        </Box>
-      );
+        </NetPyNEField>
+
+        {this.densityExtras}
+
+        {this.dialogPop}
+      </Box>
+    );
+  }
+
+  getPreConditionsTab () {
+    return (
+      <Box className="scrollbar scrollchild" mt={1}>
+        <NetPyNEField id="netParams.subConnParams.preConds.pop">
+          <NetPyNESelectField
+            model={
+              `netParams.subConnParams['${
+                this.props.name
+              }']['preConds']['pop']`
+            }
+            method="netpyne_geppetto.getAvailablePops"
+            postProcessItems={this.postProcessMenuItems}
+            multiple
+          />
+        </NetPyNEField>
+
+        <NetPyNEField id="netParams.subConnParams.preConds.cellType">
+          <NetPyNESelectField
+            fullWidth
+            model={
+              `netParams.subConnParams['${
+                this.props.name
+              }']['preConds']['cellType']`
+            }
+            method="netpyne_geppetto.getAvailableCellTypes"
+            postProcessItems={this.postProcessMenuItems}
+            multiple
+          />
+        </NetPyNEField>
+
+        <NetPyNECoordsRange
+          id="xRangePreConn"
+          name={this.props.name}
+          model="netParams.subConnParams"
+          conds="preConds"
+          items={[
+            {
+              value: 'x',
+              label: 'Absolute',
+            },
+            {
+              value: 'xnorm',
+              label: 'Normalized',
+            },
+          ]}
+        />
+
+        <NetPyNECoordsRange
+          id="yRangePreConn"
+          name={this.props.name}
+          model="netParams.subConnParams"
+          conds="preConds"
+          items={[
+            {
+              value: 'y',
+              label: 'Absolute',
+            },
+            {
+              value: 'ynorm',
+              label: 'Normalized',
+            },
+          ]}
+        />
+
+        <NetPyNECoordsRange
+          id="zRangePreConn"
+          name={this.props.name}
+          model="netParams.subConnParams"
+          conds="preConds"
+          items={[
+            {
+              value: 'z',
+              label: 'Absolute',
+            },
+            {
+              value: 'znorm',
+              label: 'Normalized',
+            },
+          ]}
+        />
+      </Box>
+    );
+  }
+
+  getPostConditionsTab () {
+    return (
+      <Box className="scrollbar scrollchild" mt={1}>
+        <NetPyNEField id="netParams.subConnParams.postConds.pop">
+          <NetPyNESelectField
+            model={
+              `netParams.subConnParams['${
+                this.props.name
+              }']['postConds']['pop']`
+            }
+            fullWidth
+            method="netpyne_geppetto.getAvailablePops"
+            postProcessItems={this.postProcessMenuItems}
+            multiple
+          />
+        </NetPyNEField>
+
+        <NetPyNEField id="netParams.subConnParams.postConds.cellType">
+          <NetPyNESelectField
+            model={
+              `netParams.subConnParams['${
+                this.props.name
+              }']['postConds']['cellType']`
+            }
+            method="netpyne_geppetto.getAvailableCellTypes"
+            postProcessItems={this.postProcessMenuItems}
+            multiple
+            fullWidth
+          />
+        </NetPyNEField>
+
+        <NetPyNECoordsRange
+          id="xRangePostConn"
+          name={this.props.name}
+          model="netParams.subConnParams"
+          conds="postConds"
+          items={[
+            {
+              value: 'x',
+              label: 'Absolute',
+            },
+            {
+              value: 'xnorm',
+              label: 'Normalized',
+            },
+          ]}
+        />
+
+        <NetPyNECoordsRange
+          id="yRangePostConn"
+          name={this.props.name}
+          model="netParams.subConnParams"
+          conds="postConds"
+          items={[
+            {
+              value: 'y',
+              label: 'Absolute',
+            },
+            {
+              value: 'ynorm',
+              label: 'Normalized',
+            },
+          ]}
+        />
+
+        <NetPyNECoordsRange
+          id="zRangePostConn"
+          name={this.props.name}
+          model="netParams.subConnParams"
+          conds="postConds"
+          items={[
+            {
+              value: 'z',
+              label: 'Absolute',
+            },
+            {
+              value: 'znorm',
+              label: 'Normalized',
+            },
+          ]}
+        />
+      </Box>
+    );
+  }
+
+  select (index, sectionId) {
+    if (sectionId === 'General') {
+      this.content = this.getGeneralTab();
+    } else if (sectionId === 'Pre Conditions') {
+      this.content = this.getPreConditionsTab();
+    } else if (sectionId === 'Post Conditions') {
+      this.content = this.getPostConditionsTab();
     }
 
-    // Generate Menu
+    this.setState({
+      selectedIndex: index,
+      sectionId,
+    }, () => {
+      this.props.updateCards();
+    });
+  }
+
+  refreshComponent () {
+    // get initial values
+    Utils.evalPythonMessage(`netpyne_geppetto.netParams.subConnParams["${
+      this.props.name
+    }"]`)
+      .then((response) => {
+        if ((typeof response === 'object') && (response.density)) {
+          this.setState({ type: response.density.type, density: response.density }); // splitting so it fires update
+        }
+      });
+  }
+
+  render () {
     let index = 0;
     const bottomNavigationItems = [];
     bottomNavigationItems.push(
@@ -532,10 +560,8 @@ export default class NetPyNESubCellsConnectivityRule extends React.Component {
         <BottomNavigation showLabels value={this.state.selectedIndex}>
           {bottomNavigationItems}
         </BottomNavigation>
-        {content}
+        {this.content}
       </div>
     );
   }
-
-  handleChange = (event, index, values) => this.setState({ values });
 }
