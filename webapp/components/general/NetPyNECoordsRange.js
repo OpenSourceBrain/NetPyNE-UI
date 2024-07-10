@@ -127,7 +127,7 @@ export default class NetPyNECoordsRange extends Component {
     this.setState({ rangeType})
   }
 
-  //preConds: pop, cellType, cellModel, x, y, z, xnorm, ynorm, znorm
+  // preConds: pop, cellType, cellModel, x, y, z, xnorm, ynorm, znorm
   handleCoordParamChange(index, newValue) {
     const {
       model,
@@ -135,6 +135,9 @@ export default class NetPyNECoordsRange extends Component {
       name,
     } = this.props;
 
+    if (Object.is(newValue, NaN)) {
+      newValue = 0;
+    }
 
     if (newValue === '' || (/^\d+$/.test(newValue))) {
       if (this.state.rangeType && this.state.rangeType.length > 0)
