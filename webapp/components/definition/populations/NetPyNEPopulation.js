@@ -560,12 +560,11 @@ netpyne_geppetto.netParams.popParams['${this.props.name}']['pulses'].pop(${index
   }
 
   resetError () {
+    const { updateCards } = this.props;
     this.setState({
       errorMessage: undefined,
       errorDetails: undefined,
-    }, () => {
-      this.props.updateCards();
-    });
+    }, updateCards());
   }
 
   render () {
