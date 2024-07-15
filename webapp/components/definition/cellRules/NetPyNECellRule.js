@@ -33,6 +33,9 @@ class NetPyNECellRule extends React.Component {
         // Rename the population in Python
         Utils.renameKey('netParams.cellParams', storedValue, newValue, (response, newValue) => {
           this.renaming = false;
+          // TODO: this logic below needs a cleanup across components, and also, why this is not handled in the python controlled capabilities
+          // if the logic we have here is mostly repeated across multiple components?
+          this.props.updateCards();
         });
         this.renaming = true;
       });
