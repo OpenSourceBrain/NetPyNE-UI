@@ -44,7 +44,7 @@ const tutorial_steps = [
     )
   },
    {
-    target: '#Geometry', // check
+    target: '#sectionGeomTab', // check
     title: "Explore the new cell type properties",
     content: (
       <p>In the geometry tab we can see the dimensions of this section (cylinder of 12 by 12 um)</p>
@@ -55,7 +55,7 @@ const tutorial_steps = [
     title: 'Create a cell population',
     content: (
       <>
-        <p>Click on the Populations icon on the left sidebar</p> 
+        <p>Click on the Populations icon on the left sidebar</p>
         <p>You can also find each icon as a tab in the top panel</p>
       </>
     )
