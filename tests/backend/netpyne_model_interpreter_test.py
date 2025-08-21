@@ -91,7 +91,7 @@ class TestNetPyNEModelInterpreter(unittest.TestCase):
         from gui_tut1 import netParams, simConfig
         self.getGeppettoModel(netParams, simConfig)
 
-    '''
+    
     # @unittest.skip("Neuron restart kernel issue")
     def test_tut2(self):
         print("------------------------------------")
@@ -107,7 +107,7 @@ class TestNetPyNEModelInterpreter(unittest.TestCase):
         print("------------------------------------")
         from gui_tut3 import netParams, simConfig
         self.getGeppettoModel(netParams, simConfig)
-
+    '''
     # @unittest.skip("Neuron restart kernel issue")
     def test_tut4(self):
         print("------------------------------------")
