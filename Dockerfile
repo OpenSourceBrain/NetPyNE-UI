@@ -83,7 +83,7 @@ RUN mv workspace /opt/workspace/tutorials
 RUN chown -R $NB_UID /opt/workspace
 RUN ln -s /opt/workspace workspace
 
-RUN jupyter labextension disable @jupyterlab/hub-extension
+# RUN jupyter labextension disable @jupyterlab/hub-extension
 
 COPY --from=downloads --chown=1000:1000 /nyhead.mat $NP_LFPYKIT_HEAD_FILE
 COPY --from=jsbuild --chown=1000:1000 $FOLDER/webapp/build webapp/build
