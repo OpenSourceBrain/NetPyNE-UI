@@ -46,7 +46,7 @@ const AboutContent = withStyles(styles)(({ classes }) => (
         Want to know more? Go to our
         {' '}
         <Link
-          href="http://netpyne.org/about.html#what-is-netpyne"
+          href="http://netpyne.org/"
           target="_blank"
         >
           website
