@@ -22,10 +22,10 @@ const AboutContent = withStyles(styles)(({ classes }) => (
         NetPyNE-UI v1.1.3+osbv2
       </Link>
       <Link variant="h5" style={{ display: 'block' }} href="https://github.com/Neurosim-lab/netpyne" target="_blank">
-        NetPyNE v1.0.6
+        NetPyNE v1.1.0+osbv2
       </Link>
       <Link variant="h5" style={{ display: 'block' }} href="https://www.neuron.yale.edu/neuron/" target="_blank">
-        NEURON v8.2.2
+        NEURON v8.2.6
       </Link>
     </Box>
 
