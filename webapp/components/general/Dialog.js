@@ -5,7 +5,7 @@ import { Typography, Paper, Box, Link, Icon } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { secondaryColor, bgLight } from '../../theme';
 import logoNetpyne from '../../static/netpyne-logo_white.png';
-import logoMetaCell from '../../static/metacell_new.png';
+import logoMetaCell from '../../static/metacell.png';
 
 const styles = (theme) => ({
   paper: {
