@@ -17,7 +17,7 @@ jobs:
 
     - name: Build the Docker image
       run: |
-        time docker build  -t mynetpyneui -f Dockerfile  .
+        ./build_docker.sh
         
     - name: Info on Docker image sizes
       run: |
