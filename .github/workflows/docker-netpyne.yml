@@ -1,0 +1,28 @@
+name: Docker Image Build NetPyNE-UI
+
+on:
+  push:
+    branches: [ master, dev*, feature/docker*, feature/repo* ]
+  pull_request:
+    branches: [ master, dev*, feature/docker*, feature/repo* ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build the Docker image
+      run: |
+        time docker build  -t mynetpyneui -f Dockerfile  .
+        
+    - name: Info on Docker image sizes
+      run: |
+        docker images
+
+    - name: Run the Docker container and list python installs
+      run: |
+        docker run -t --rm --entrypoint /bin/bash mynetpyneui  -c "pip3 list && python -V"
