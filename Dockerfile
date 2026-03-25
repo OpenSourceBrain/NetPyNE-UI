@@ -1,7 +1,5 @@
 FROM node:16-bullseye as jsbuild
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
-
 WORKDIR /app
 
 COPY --chown=1000:1000 webapp/package.json .
