@@ -1,4 +1,4 @@
-FROM node:13.14 as jsbuild
+FROM node:16-bullseye as jsbuild
 
 WORKDIR /app
 
@@ -63,5 +63,3 @@ RUN wget --no-check-certificate -P ${FOLDER}/workspace https://www.parralab.org/
 USER $NB_UID
 
 EXPOSE 8888
-
-
