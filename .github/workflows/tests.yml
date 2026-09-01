@@ -7,10 +7,12 @@ on:
     branches:
      - "master"
      - "development"
+     - "osb*"
   pull_request:
     branches:
      - "master"
      - "development"
+     - "osb*"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs: 
